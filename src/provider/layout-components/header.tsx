@@ -42,7 +42,7 @@ const Header = () => {
 
   return (
     <>
-      <div className="bg-gray-800 w-full p-5 flex justify-between items-center  border-solid border-b-4 border-yellow-400">
+      <div className="bg-gray-800 w-full p-5 flex justify-between items-center  border-solid border-b-8 border-yellow-400">
         <div>
           <h1 className="text-2xl font-bold uppercase text-white">Yoda Chat</h1>
         </div>
