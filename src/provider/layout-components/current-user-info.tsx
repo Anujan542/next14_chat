@@ -10,13 +10,15 @@ import {
   SheetTitle,
   Sheet,
 } from "@/components/ui/sheet";
+import { UploadImageToFirebaseAndReturnUrl } from "@/helpers/image-upload";
 import { UserType } from "@/interfaces";
-import { UserState } from "@/redux/userSlice";
+import { SetCurrentUser, UserState } from "@/redux/userSlice";
+import { UpdateUserProfilepicture } from "@/server-actions/users";
 import { useClerk } from "@clerk/nextjs";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 interface userInfoProps {
   showUserInfo: boolean;
@@ -25,15 +27,12 @@ interface userInfoProps {
 
 const CurrentUserInfo = ({ setShowUserInfo, showUserInfo }: userInfoProps) => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const { signOut } = useClerk();
 
   const [loading, setLoading] = useState(false);
   const [selectedFile, setSelctedFile] = useState<File | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const { currentUserData }: UserState = useSelector(
-    (state: any) => state.user
-  );
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files && event.target.files[0]; // Check if files array exists and has at least one file
@@ -67,6 +66,31 @@ const CurrentUserInfo = ({ setShowUserInfo, showUserInfo }: userInfoProps) => {
       inputRef.current.click(); // Programmatically trigger input click
     }
   };
+
+  const updateProfilePicture = async () => {
+    try {
+      setLoading(true);
+
+      const url: string = await UploadImageToFirebaseAndReturnUrl(
+        selectedFile!
+      );
+      const response = await UpdateUserProfilepicture(currentUserData._id, {
+        profilePicture: url,
+      });
+
+      if (response.error) throw new Error(response.error);
+
+      dispatch(SetCurrentUser(response as UserType));
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const { currentUserData }: UserState = useSelector(
+    (state: any) => state.user
+  );
 
   return (
     <Sheet
@@ -119,6 +143,7 @@ const CurrentUserInfo = ({ setShowUserInfo, showUserInfo }: userInfoProps) => {
         <div className="mt-14 flex flex-col gap-4">
           <Button
             className="w-full uppercase bg-yellow-300 text-black"
+            onClick={updateProfilePicture}
             disabled={!selectedFile}
           >
             Update Profile Picture

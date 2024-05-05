@@ -36,3 +36,17 @@ export const GetCurrentUserFromMongoDB = async () => {
     };
   }
 };
+
+export const UpdateUserProfilepicture = async (
+  userId: string,
+  payload: any
+) => {
+  try {
+    const updatePicture = await UserModel.findByIdAndUpdate(userId, payload, {
+      new: true,
+    });
+    return JSON.parse(JSON.stringify(updatePicture));
+  } catch (error) {
+    console.log(error);
+  }
+};

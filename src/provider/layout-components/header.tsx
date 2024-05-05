@@ -12,31 +12,33 @@ const Header = () => {
   const dispatch = useDispatch();
   const pathName = usePathname();
 
+  const [showUserInfo, setShowUserInfo] = useState<boolean>(false);
+  const [isProtectedRoute, setIsProtectedRoute] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsProtectedRoute(
+      pathName.includes("sign-in") || pathName.includes("sign-out")
+    );
+
+    const getCurrentUser = async () => {
+      try {
+        const res = await GetCurrentUserFromMongoDB();
+        if (res.error) {
+          throw new Error(res.error);
+        }
+        dispatch(SetCurrentUser(res as UserType));
+      } catch (error: any) {
+        console.log(error);
+      }
+    };
+    getCurrentUser();
+  }, [dispatch, pathName]);
+
   const { currentUserData }: UserState = useSelector(
     (state: any) => state.user
   );
 
-  const isProtectedRoute =
-    pathName.includes("sign-in") || pathName.includes("sign-out");
   if (isProtectedRoute) return null;
-
-  const [showUserInfo, setShowUserInfo] = useState<boolean>(false);
-
-  const getCurrentUser = async () => {
-    try {
-      const res = await GetCurrentUserFromMongoDB();
-      if (res.error) {
-        throw new Error(res.error);
-      }
-      dispatch(SetCurrentUser(res as UserType));
-    } catch (error: any) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    getCurrentUser();
-  }, []);
 
   return (
     <>
