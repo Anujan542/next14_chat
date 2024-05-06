@@ -17,7 +17,7 @@ const Header = () => {
 
   useEffect(() => {
     setIsProtectedRoute(
-      pathName.includes("sign-in") || pathName.includes("sign-out")
+      pathName.includes("sign-in") || pathName.includes("sign-up")
     );
 
     const getCurrentUser = async () => {

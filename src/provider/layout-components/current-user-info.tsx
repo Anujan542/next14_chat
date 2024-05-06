@@ -16,6 +16,7 @@ import { SetCurrentUser, UserState } from "@/redux/userSlice";
 import { UpdateUserProfilepicture } from "@/server-actions/users";
 import { useClerk } from "@clerk/nextjs";
 import dayjs from "dayjs";
+import { LoaderIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -148,9 +149,16 @@ const CurrentUserInfo = ({ setShowUserInfo, showUserInfo }: userInfoProps) => {
           >
             Update Profile Picture
           </Button>
-          <Button className="w-full uppercase" onClick={logOut}>
-            Logout
-          </Button>
+
+          <div className="flex justify-center">
+            {loading ? (
+              <LoaderIcon className="animate-spin" />
+            ) : (
+              <Button className="w-full uppercase" onClick={logOut}>
+                Logout
+              </Button>
+            )}
+          </div>
         </div>
       </SheetContent>
     </Sheet>

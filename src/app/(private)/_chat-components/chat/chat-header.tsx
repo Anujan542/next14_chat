@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import {
   DropdownMenu,
@@ -7,11 +8,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EllipsisVertical } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import NewChatModal from "./new-chat-modal";
 
 const ChatHeader = () => {
-  const [showNewChatModal, setShowNewChatModal] = useState(false);
+  const [showNewChatModal, setShowNewChatModal] = useState<boolean>(false);
 
   return (
     <>
@@ -19,9 +19,7 @@ const ChatHeader = () => {
         <h1 className="text-gray-600 font-bold text-xl uppercase">My Chats</h1>
         <DropdownMenu>
           <DropdownMenuTrigger>
-            <Button variant="outline">
-              <EllipsisVertical />
-            </Button>
+            <EllipsisVertical />
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onClick={() => setShowNewChatModal(true)}>
@@ -32,10 +30,12 @@ const ChatHeader = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <NewChatModal
-        showNewChatModal={showNewChatModal}
-        setShowNewChatModal={setShowNewChatModal}
-      />
+      {showNewChatModal && (
+        <NewChatModal
+          showNewChatModal={showNewChatModal}
+          setShowNewChatModal={setShowNewChatModal}
+        />
+      )}
     </>
   );
 };

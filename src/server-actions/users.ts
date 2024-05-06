@@ -18,7 +18,7 @@ export const GetCurrentUserFromMongoDB = async () => {
 
     let email = "";
     if (clerkUser?.emailAddresses) {
-      email = clerkUser.emailAddresses[0].emailAddress || "";
+      email = clerkUser?.emailAddresses[0]?.emailAddress || "";
     }
 
     const clerkUserPayload = {
@@ -29,6 +29,7 @@ export const GetCurrentUserFromMongoDB = async () => {
       profilePicture: clerkUser?.imageUrl,
     };
     const newUser = await UserModel.create(clerkUserPayload);
+
     return JSON.parse(JSON.stringify(newUser));
   } catch (error: any) {
     return {
@@ -50,3 +51,13 @@ export const UpdateUserProfilepicture = async (
     console.log(error);
   }
 };
+
+export const getAllUsers = async () => {
+  try {
+    const users = await UserModel.find({});
+    return JSON.parse(JSON.stringify(users));
+  } catch (error) {
+    console.log(error);
+  }
+};
+
