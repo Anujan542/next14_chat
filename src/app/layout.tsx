@@ -4,6 +4,7 @@ import ThemeProvider from "@/provider/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import LayoutProvider from "@/provider/layout-provider";
 import ReduxProvider from "@/provider/redux-provider";
+import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,6 +25,7 @@ export default function RootLayout({
               <LayoutProvider>{children}</LayoutProvider>
             </ReduxProvider>
           </ThemeProvider>
+          <Toaster />
         </body>
       </html>
     </ClerkProvider>

@@ -14,6 +14,9 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useSelector } from "react-redux";
 import { UserState } from "@/redux/userSlice";
+import { createChat } from "@/server-actions/chats";
+import { toast } from "@/components/ui/use-toast";
+import { ChatState } from "@/redux/chatSlice";
 
 interface ModalProps {
   showNewChatModal: boolean;
@@ -26,10 +29,13 @@ const NewChatModal = ({
 }: ModalProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
 
   const { currentUserData }: UserState = useSelector(
     (state: any) => state.user
   );
+
+  const { chats }: ChatState = useSelector((state: any) => state.chat);
 
   const getUsers = async () => {
     try {
@@ -40,6 +46,31 @@ const NewChatModal = ({
       setUsers(res as UserType[]);
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addUserToChat = async (userId: string) => {
+    try {
+      setSelectedUserId(userId);
+      setIsLoading(true);
+
+      const res = await createChat({
+        users: [userId, currentUserData?._id],
+        createdBy: currentUserData?._id,
+        isGrouoChat: false,
+      });
+
+      if (res.error) throw new Error(res.error);
+      setShowNewChatModal(false);
+      toast({
+        title: "Chat created successfully",
+        variant: "default",
+        className:
+          "top-0 right-0 flex fixed md:max-w-[420px] md:top-10 md:right-100 bg-green-400",
+      });
+    } catch (error) {
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +92,7 @@ const NewChatModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        {isLoading && (
+        {isLoading && !selectedUserId && (
           <div className="flex justify-center my-20">
             <LoaderIcon className="animate-spin" />
           </div>
@@ -70,7 +101,11 @@ const NewChatModal = ({
         {!isLoading && users.length > 0 && (
           <div className="flex flex-col gap-3">
             {users.map((user) => {
-              if (user._id === currentUserData._id) return null;
+              const chatAlreadyCreated = chats.find((chat) =>
+                chat.users.find((u) => u?._id === user?._id)
+              );
+              if (user._id === currentUserData._id || chatAlreadyCreated)
+                return null;
               return (
                 <div
                   key={user._id}
@@ -82,7 +117,9 @@ const NewChatModal = ({
                     </Avatar>
                     <Label>{user.name}</Label>
                   </div>
-                  <Button size="sm">Add to chat</Button>
+                  <Button onClick={() => addUserToChat(user?._id)} size="sm">
+                    Add to chat
+                  </Button>
                 </div>
               );
             })}
