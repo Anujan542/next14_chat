@@ -12,11 +12,11 @@ import { LoaderIcon } from "lucide-react";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { UserState } from "@/redux/userSlice";
 import { createChat } from "@/server-actions/chats";
 import { toast } from "@/components/ui/use-toast";
-import { ChatState } from "@/redux/chatSlice";
+import { ChatState, SetChats } from "@/redux/chatSlice";
 
 interface ModalProps {
   showNewChatModal: boolean;
@@ -27,6 +27,8 @@ const NewChatModal = ({
   showNewChatModal,
   setShowNewChatModal,
 }: ModalProps) => {
+  const dispatch = useDispatch();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [users, setUsers] = useState<UserType[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
@@ -59,17 +61,19 @@ const NewChatModal = ({
       const res = await createChat({
         users: [userId, currentUserData?._id],
         createdBy: currentUserData?._id,
-        isGrouoChat: false,
+        isGroupChat: false,
       });
 
       if (res.error) throw new Error(res.error);
-      setShowNewChatModal(false);
+
       toast({
         title: "Chat created successfully",
         variant: "default",
         className:
           "top-0 right-0 flex fixed md:max-w-[420px] md:top-10 md:right-100 bg-green-400",
       });
+      dispatch(SetChats(res));
+      setShowNewChatModal(false);
     } catch (error) {
     } finally {
       setIsLoading(false);

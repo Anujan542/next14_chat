@@ -1,9 +1,11 @@
 "use client";
-import { SetChats } from "@/redux/chatSlice";
+import { ChatState, SetChats } from "@/redux/chatSlice";
 import { UserState } from "@/redux/userSlice";
 import { getAllChats } from "@/server-actions/chats";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import ChatCard from "./chat-card";
+import { LoaderIcon } from "lucide-react";
 
 const ChatList = () => {
   const dispatch = useDispatch();
@@ -14,13 +16,15 @@ const ChatList = () => {
     (state: any) => state.user
   );
 
+  const { chats }: ChatState = useSelector((state: any) => state.chat);
+
   const getChats = async () => {
     try {
       setLoading(true);
 
       const res = await getAllChats(currentUserData?._id!);
 
-      if (res.errroe) throw new Error(res.error);
+      if (res.error) throw new Error(res.error);
 
       dispatch(SetChats(res));
     } catch (error) {
@@ -31,12 +35,22 @@ const ChatList = () => {
   };
 
   useEffect(() => {
-    getChats();
+    if (currentUserData) {
+      getChats();
+    }
   }, [currentUserData]);
 
   return (
     <div>
-      <h5>ChatList</h5>
+      <div className="flex flex-col gap-5 mt-7">
+        {loading && (
+          <div className="flex justify-center">
+            <LoaderIcon className="animate-spin" />
+          </div>
+        )}
+        {chats.length > 0 &&
+          chats.map((chat) => <ChatCard key={chat._id} chat={chat} />)}
+      </div>
     </div>
   );
 };

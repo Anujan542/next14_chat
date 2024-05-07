@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { EllipsisVertical } from "lucide-react";
 import NewChatModal from "./new-chat-modal";
+import { Input } from "@/components/ui/input";
 
 const ChatHeader = () => {
   const [showNewChatModal, setShowNewChatModal] = useState<boolean>(false);
@@ -30,6 +31,11 @@ const ChatHeader = () => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      <Input
+        type="text"
+        placeholder="search chats..."
+        className="mt-5 w-full rounded-md px-3 h-10 bg-gray-200 "
+      />
       {showNewChatModal && (
         <NewChatModal
           showNewChatModal={showNewChatModal}
